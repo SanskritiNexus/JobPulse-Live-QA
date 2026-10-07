@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobPulse Live — Track. Apply. Prepare. Get Hired.</title>
+  <meta name="description" content="Discover live Indian job listings via Adzuna API and track your job applications seamlessly with a simple, testable dashboard.">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Top Header Bar -->
+    <header class="header-navbar">
+      <div class="brand-header">
+        <h1>⚡ JobPulse Live</h1>
+        <div class="brand-tagline">Track. Apply. Prepare. Get Hired.</div>
+      </div>
+
+      <div class="header-right">
+        <div id="providerStatusBadge" class="status-badge">
+          <span id="providerStatusDot" class="dot-indicator"></span>
+          <span id="providerStatusText">Adzuna API (IN)</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="tab-nav">
+      <button id="tabDiscovery" class="tab-btn active" data-target="viewDiscovery">
+        🔍 Live Job Discovery
+      </button>
+      <button id="tabTracker" class="tab-btn" data-target="viewTracker">
+        📊 Application Kanban Board
+      </button>
+      <button id="tabAnalytics" class="tab-btn" data-target="viewAnalytics">
+        📈 Analytics & Insights
+      </button>
+    </nav>
+
+    <!-- =================================================================== -->
+    <!-- TAB 1: LIVE JOB DISCOVERY -->
+    <!-- =================================================================== -->
+    <main id="viewDiscovery" class="tab-content active">
+      <section class="search-card">
+        <form id="searchForm" class="search-form-row">
+          <input type="text" id="searchInput" class="form-control" placeholder="Search title, skills, or company (e.g. Software Engineer, QA Tester, React)...">
+          
+          <select id="locationFilter" class="form-control">
+            <option value="India">All India</option>
+            <option value="Bangalore">Bengaluru / Bangalore</option>
+            <option value="Mumbai">Mumbai</option>
+            <option value="Gurgaon">Gurugram / NCR</option>
+            <option value="Hyderabad">Hyderabad</option>
+            <option value="Pune">Pune</option>
+            <option value="Remote">Remote</option>
+          </select>
+
+          <select id="categoryFilter" class="form-control">
+            <option value="">All Categories</option>
+            <option value="IT & Software">IT & Software</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Data Science">Data & AI</option>
+            <option value="Design">Product & UI Design</option>
+          </select>
+
+          <select id="sortFilter" class="form-control">
+            <option value="date">Sort: Latest First</option>
+            <option value="salary">Sort: Highest Salary</option>
+          </select>
+
+          <button type="submit" id="searchButton" class="btn-primary">
+            🔍 Search Jobs
+          </button>
+        </form>
+
+        <div class="popular-chips">
+          <span>Popular Searches:</span>
+          <button type="button" class="chip-btn" data-query="Software Engineer">Software Engineer</button>
+          <button type="button" class="chip-btn" data-query="QA Tester">QA Tester</button>
+          <button type="button" class="chip-btn" data-query="Data Analyst">Data Analyst</button>
+          <button type="button" class="chip-btn" data-query="Full Stack Developer">Full Stack Developer</button>
+          <button type="button" class="chip-btn" data-query="DevOps Engineer">DevOps Engineer</button>
+        </div>
+      </section>
+
+      <section>
+        <div class="results-header">
+          <h2>Live Job Listings</h2>
+          <div id="searchResultsMeta" class="results-meta">Loading live jobs...</div>
+        </div>
+
+        <!-- Job Cards Container -->
+        <div id="jobList" class="job-grid">
+          <!-- Rendered dynamically by jobs.js -->
+        </div>
+
+        <!-- Pagination Controls -->
+        <div id="pagination" class="pagination">
+          <button id="btnPrevPage" class="btn-secondary" disabled>← Previous</button>
+          <span id="pageIndicator" class="page-indicator">Page 1</span>
+          <button id="btnNextPage" class="btn-secondary">Next →</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- =================================================================== -->
+    <!-- TAB 2: APPLICATION KANBAN BOARD -->
+    <!-- =================================================================== -->
+    <main id="viewTracker" class="tab-content">
+      <div style="margin-bottom: 16px;">
+        <h2 style="font-size: 1.3rem;">Application Kanban Board</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Manage and track your active job application lifecycle.</p>
+      </div>
+
+      <div id="kanbanBoard" class="kanban-board">
+        <!-- Wishlist Column -->
+        <div id="colWishlist" class="kanban-col">
+          <div class="col-header">
+            <span>📌 Wishlist</span>
+            <span id="countWishlist" class="col-count">0</span>
+          </div>
+          <div id="cardsWishlist" class="kanban-cards-container"></div>
+        </div>
+
+        <!-- Applied Column -->
+        <div id="colApplied" class="kanban-col">
+          <div class="col-header">
+            <span>📤 Applied</span>
+            <span id="countApplied" class="col-count">0</span>
+          </div>
+          <div id="cardsApplied" class="kanban-cards-container"></div>
+        </div>
+
+        <!-- Interviewing Column -->
+        <div id="colInterviewing" class="kanban-col">
+          <div class="col-header">
+            <span>💬 Interviewing</span>
+            <span id="countInterviewing" class="col-count">0</span>
+          </div>
+          <div id="cardsInterviewing" class="kanban-cards-container"></div>
+        </div>
+
+        <!-- Offer Column -->
+        <div id="colOffer" class="kanban-col">
+          <div class="col-header">
+            <span>🎉 Offer</span>
+            <span id="countOffer" class="col-count">0</span>
+          </div>
+          <div id="cardsOffer" class="kanban-cards-container"></div>
+        </div>
+
+        <!-- Rejected Column -->
+        <div id="colRejected" class="kanban-col">
+          <div class="col-header">
+            <span>❌ Rejected</span>
+            <span id="countRejected" class="col-count">0</span>
+          </div>
+          <div id="cardsRejected" class="kanban-cards-container"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- =================================================================== -->
+    <!-- TAB 3: ANALYTICS & DASHBOARD -->
+    <!-- =================================================================== -->
+    <main id="viewAnalytics" class="tab-content">
+      <div style="margin-bottom: 20px;">
+        <h2 style="font-size: 1.3rem;">Analytics & Application Pipeline</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Track your overall metrics and interview conversion rate.</p>
+      </div>
+
+      <div id="dashboardView" class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">Total Applications Tracked</div>
+          <div id="statTotalTracked" class="metric-value">0</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">Target Companies</div>
+          <div id="statTotalCompanies" class="metric-value">0</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">Interview Response Rate</div>
+          <div id="statResponseRate" class="metric-value">0%</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">Active Interviews</div>
+          <div id="statInterviewsCount" class="metric-value" style="color: var(--warning);">0</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">Offers Received</div>
+          <div id="statOffersCount" class="metric-value" style="color: var(--success);">0</div>
+        </div>
+      </div>
+
+      <div class="search-card" style="margin-top: 20px;">
+        <h3 style="font-size: 1.05rem; margin-bottom: 14px;">Pipeline Stages Breakdown</h3>
+        <div id="stagesBreakdownContainer">
+          <!-- Rendered dynamically by dashboard.js -->
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Modal for Tracking Job -->
+  <div id="trackJobModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Save Position to Application Tracker</h3>
+        <button type="button" id="btnCloseModal" class="btn-close">&times;</button>
+      </div>
+      <form id="trackJobForm">
+        <input type="hidden" id="modalJobId">
+        <input type="hidden" id="modalSourceUrl">
+        <input type="hidden" id="modalSourceName">
+
+        <div class="form-group">
+          <label for="modalTitle">Job Title</label>
+          <input type="text" id="modalTitle" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label for="modalCompany">Company Name</label>
+          <input type="text" id="modalCompany" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label for="modalLocation">Location</label>
+          <input type="text" id="modalLocation" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="modalStage">Application Stage</label>
+          <select id="modalStage" class="form-control">
+            <option value="Wishlist">Wishlist</option>
+            <option value="Applied">Applied</option>
+            <option value="Interviewing">Interviewing</option>
+            <option value="Offer">Offer</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="modalSalary">Salary Info</label>
+          <input type="text" id="modalSalary" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="modalNotes">Notes & Preparation</label>
+          <textarea id="modalNotes" class="form-control" rows="3" placeholder="Add details, interview preparation notes, or referral info..."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" id="btnCancelModal" class="btn-secondary">Cancel</button>
+          <button type="submit" id="saveJobButton" class="btn-primary">Save Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Frontend Modular Scripts -->
+  <script type="module" src="/js/app.js"></script>
+
+</body>
+</html>

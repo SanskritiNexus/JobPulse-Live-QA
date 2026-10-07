@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobPulse Live — Real Job Search & Application Tracker (India)</title>
+  <meta name="description" content="Discover live job listings across India using legitimate job search APIs and track your applications seamlessly with glassmorphism dashboard.">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Top Header Navigation -->
+    <header class="glass-panel header-navbar">
+      <div class="brand-logo">
+        <div class="brand-icon">⚡</div>
+        <div>
+          <h1>JobPulse Live</h1>
+          <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">EXTERNAL API JOB INTEGRATION • INDIA</div>
+        </div>
+      </div>
+
+      <div class="nav-stats-bar">
+        <div id="active-provider-badge" class="badge badge-provider" title="Active Backend Job API Provider">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: #34d399; display: inline-block;"></span>
+          Adzuna API (India)
+        </div>
+
+        <div class="stat-pill">
+          <span class="label">Tracked Jobs</span>
+          <span class="value" id="stat-total-tracked">0</span>
+        </div>
+        <div class="stat-pill">
+          <span class="label">Interviews</span>
+          <span class="value" id="stat-interviews" style="color: var(--accent-amber);">0</span>
+        </div>
+        <div class="stat-pill">
+          <span class="label">Offers</span>
+          <span class="value" id="stat-offers" style="color: var(--accent-emerald);">0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Credentials & Fallback Warning Banner -->
+    <div id="credentials-warning-banner" class="alert-banner alert-banner-warning" style="display: none;">
+      <!-- Populated dynamically by app.js -->
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs-navigation">
+      <button class="tab-btn active" data-target="view-discovery">
+        <span>🔍</span> Live Job Discovery
+      </button>
+      <button class="tab-btn" data-target="view-tracker">
+        <span>📊</span> Application Kanban Board
+      </button>
+      <button class="tab-btn" data-target="view-analytics">
+        <span>📈</span> Analytics & Insights
+      </button>
+      <button class="tab-btn" data-target="view-settings">
+        <span>⚙️</span> API Provider Settings
+      </button>
+    </nav>
+
+    <!-- =================================================================== -->
+    <!-- TAB 1: LIVE JOB DISCOVERY -->
+    <!-- =================================================================== -->
+    <main id="view-discovery" class="tab-view active">
+      <section class="glass-panel search-filter-card">
+        <form id="search-form" class="search-input-group">
+          <input type="text" id="search-query" class="glass-input" placeholder="Search title, skills, or company (e.g. Software Engineer, React, Python)...">
+          
+          <select id="filter-location" class="glass-input">
+            <option value="India">All India</option>
+            <option value="Bangalore">Bengaluru / Bangalore</option>
+            <option value="Mumbai">Mumbai</option>
+            <option value="Gurgaon">Gurugram / Delhi NCR</option>
+            <option value="Hyderabad">Hyderabad</option>
+            <option value="Pune">Pune</option>
+            <option value="Remote">Remote</option>
+          </select>
+
+          <select id="filter-category" class="glass-input">
+            <option value="">All Categories</option>
+            <option value="IT & Software">Software & Tech</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Data Science">Data & AI</option>
+            <option value="Design">Product & UI Design</option>
+            <option value="Marketing">Marketing & Sales</option>
+          </select>
+
+          <select id="filter-sort" class="glass-input">
+            <option value="date">Sort: Latest First</option>
+            <option value="salary">Sort: Highest Salary</option>
+          </select>
+
+          <button type="submit" class="glass-button-primary">
+            <span>🔎</span> Search
+          </button>
+        </form>
+
+        <div class="suggested-chips">
+          <span class="chip-label">Popular Searches:</span>
+          <button class="chip-btn" data-query="Full Stack Developer">Full Stack Developer</button>
+          <button class="chip-btn" data-query="Backend Engineer">Backend Engineer</button>
+          <button class="chip-btn" data-query="Frontend Developer">Frontend Developer</button>
+          <button class="chip-btn" data-query="Data Scientist">Data Scientist</button>
+          <button class="chip-btn" data-query="DevOps Engineer">DevOps Engineer</button>
+          <button class="chip-btn" data-query="Product Manager">Product Manager</button>
+        </div>
+      </section>
+
+      <section>
+        <div class="results-header-bar">
+          <h2>Live Indian Job Listings</h2>
+          <div id="search-results-meta" style="font-size: 0.85rem; color: var(--text-secondary);">
+            Loading live jobs from API...
+          </div>
+        </div>
+
+        <div id="jobs-results-grid" class="jobs-grid">
+          <!-- Job Cards rendered dynamically by app.js -->
+        </div>
+      </section>
+    </main>
+
+    <!-- =================================================================== -->
+    <!-- TAB 2: APPLICATION KANBAN BOARD -->
+    <!-- =================================================================== -->
+    <main id="view-tracker" class="tab-view">
+      <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <h2 style="font-family: var(--font-heading); font-size: 1.4rem;">Application Kanban Board</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Manage your job application pipeline and interview stages in real-time.</p>
+        </div>
+      </div>
+
+      <div class="kanban-board">
+        <!-- Wishlist -->
+        <div class="kanban-column column-wishlist">
+          <div class="column-header">
+            <span class="column-title">📌 Wishlist</span>
+            <span id="count-wishlist" class="item-count">0</span>
+          </div>
+          <div id="kanban-col-wishlist" class="kanban-cards-container"></div>
+        </div>
+
+        <!-- Applied -->
+        <div class="kanban-column column-applied">
+          <div class="column-header">
+            <span class="column-title">📩 Applied</span>
+            <span id="count-applied" class="item-count">0</span>
+          </div>
+          <div id="kanban-col-applied" class="kanban-cards-container"></div>
+        </div>
+
+        <!-- Interviewing -->
+        <div class="kanban-column column-interviewing">
+          <div class="column-header">
+            <span class="column-title">🗣️ Interviewing</span>
+            <span id="count-interviewing" class="item-count">0</span>
+          </div>
+          <div id="kanban-col-interviewing" class="kanban-cards-container"></div>
+        </div>
+
+        <!-- Offer -->
+        <div class="kanban-column column-offer">
+          <div class="column-header">
+            <span class="column-title">🎉 Offer Received</span>
+            <span id="count-offer" class="item-count">0</span>
+          </div>
+          <div id="kanban-col-offer" class="kanban-cards-container"></div>
+        </div>
+
+        <!-- Rejected -->
+        <div class="kanban-column column-rejected">
+          <div class="column-header">
+            <span class="column-title">❌ Archived / Rejected</span>
+            <span id="count-rejected" class="item-count">0</span>
+          </div>
+          <div id="kanban-col-rejected" class="kanban-cards-container"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- =================================================================== -->
+    <!-- TAB 3: ANALYTICS & INSIGHTS -->
+    <!-- =================================================================== -->
+    <main id="view-analytics" class="tab-view">
+      <h2 style="font-family: var(--font-heading); font-size: 1.4rem; margin-bottom: 20px;">Job Search Performance Analytics</h2>
+      
+      <div class="analytics-grid">
+        <div class="glass-panel stat-card">
+          <div class="stat-icon" style="background: rgba(139, 92, 246, 0.15); color: #c4b5fd;">📋</div>
+          <div class="stat-data">
+            <span class="val" id="analytics-total-tracked">0</span>
+            <span class="lbl">Total Tracked</span>
+          </div>
+        </div>
+
+        <div class="glass-panel stat-card">
+          <div class="stat-icon" style="background: rgba(6, 182, 212, 0.15); color: #67e8f9;">🏢</div>
+          <div class="stat-data">
+            <span class="val" id="analytics-companies-count">0</span>
+            <span class="lbl">Companies Applied</span>
+          </div>
+        </div>
+
+        <div class="glass-panel stat-card">
+          <div class="stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #fde68a;">🎯</div>
+          <div class="stat-data">
+            <span class="val" id="analytics-response-rate">0%</span>
+            <span class="lbl">Interview Rate</span>
+          </div>
+        </div>
+
+        <div class="glass-panel stat-card">
+          <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #6ee7b7;">🏆</div>
+          <div class="stat-data">
+            <span class="val" id="analytics-offers-count">0</span>
+            <span class="lbl">Job Offers</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-panel" style="padding: 24px; max-width: 650px;">
+        <h3 style="font-size: 1.1rem; margin-bottom: 16px;">Application Pipeline Breakdown</h3>
+        <div id="analytics-stages-breakdown">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </main>
+
+    <!-- =================================================================== -->
+    <!-- TAB 4: API PROVIDER SETTINGS -->
+    <!-- =================================================================== -->
+    <main id="view-settings" class="tab-view">
+      <div class="glass-panel" style="padding: 30px; max-width: 800px;">
+        <h2 style="font-family: var(--font-heading); font-size: 1.4rem; margin-bottom: 12px;">Live External Job API Architecture</h2>
+        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px;">
+          This application integrates with official external job-data APIs. API keys are stored strictly in backend server environment variables (<code>.env</code>) and are never exposed in frontend code.
+        </p>
+
+        <div style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); padding: 18px; margin-bottom: 24px;">
+          <h4 style="color: var(--accent-cyan); margin-bottom: 8px;">🔑 How to Add Free Adzuna Credentials:</h4>
+          <ol style="color: var(--text-secondary); font-size: 0.9rem; padding-left: 20px; line-height: 1.7;">
+            <li>Sign up for a free developer account at <a href="https://developer.adzuna.com" target="_blank" style="color: var(--primary);">developer.adzuna.com</a>.</li>
+            <li>Copy your <code>app_id</code> and <code>app_key</code>.</li>
+            <li>Open <code>.env</code> file in project directory and paste your values:
+              <pre style="background: rgba(15,23,42,0.9); padding: 8px 12px; border-radius: 6px; margin-top: 6px; font-family: monospace; color: #a5b4fc;">ADZUNA_APP_ID=your_app_id_here
+ADZUNA_APP_KEY=your_app_key_here
+JOB_API_PROVIDER=adzuna</pre>
+            </li>
+            <li>The backend will automatically start fetching live real-time job listings directly from Adzuna's India search engine!</li>
+          </ol>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <a href="/api/provider/status" target="_blank" class="glass-button-secondary">
+            📡 Test Backend API Status (/api/provider/status)
+          </a>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- MODAL: TRACK LIVE JOB TO APPLICATION BOARD -->
+  <!-- =================================================================== -->
+  <div id="track-job-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
+        <h3 style="font-family: var(--font-heading); font-size: 1.25rem;">Track Job Application</h3>
+        <button id="btn-close-modal" style="background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer;">✕</button>
+      </div>
+
+      <form id="form-save-job">
+        <input type="hidden" id="modal-job-id">
+        <input type="hidden" id="modal-job-source-url">
+        <input type="hidden" id="modal-job-source-name">
+
+        <div style="margin-bottom: 14px;">
+          <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">Job Title</label>
+          <input type="text" id="modal-job-title" class="glass-input" style="width: 100%;" required>
+        </div>
+
+        <div style="grid-template-columns: 1fr 1fr; display: grid; gap: 12px; margin-bottom: 14px;">
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">Company</label>
+            <input type="text" id="modal-job-company" class="glass-input" style="width: 100%;" required>
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">Location</label>
+            <input type="text" id="modal-job-location" class="glass-input" style="width: 100%;">
+          </div>
+        </div>
+
+        <div style="grid-template-columns: 1fr 1fr; display: grid; gap: 12px; margin-bottom: 14px;">
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">Initial Stage</label>
+            <select id="modal-job-stage" class="glass-input" style="width: 100%;">
+              <option value="Wishlist">📌 Wishlist</option>
+              <option value="Applied" selected>📩 Applied</option>
+              <option value="Interviewing">🗣️ Interviewing</option>
+              <option value="Offer">🎉 Offer</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">Salary Info</label>
+            <input type="text" id="modal-job-salary" class="glass-input" style="width: 100%;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">Personal Notes</label>
+          <textarea id="modal-job-notes" class="glass-input" style="width: 100%; min-height: 70px; font-size: 0.85rem;"></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="submit" class="glass-button-primary">Save Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Application JS Entrypoint -->
+  <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>

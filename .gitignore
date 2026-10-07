@@ -1,0 +1,18 @@
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+
+# Python cache & data
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+data/applications.json
+.pytest_cache/
+
+# Node / IDE
+node_modules/
+.vscode/
+.idea/
+.DS_Store
